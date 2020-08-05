@@ -15,11 +15,22 @@ public class PessoaService {
 	private PessoaRepository pessoaRepository;
 
 	public Pessoa update(Long codigo, Pessoa pessoa) {
+		Pessoa pessoaSalva = findPeopleByCodigo(codigo);
+		BeanUtils.copyProperties(pessoa, pessoaSalva, "codigo"); // copia as propriedades para o pessoaSalva(1° parâmetro vc passa o Objeto que quer copiar,2° parâmetro o Objeto que vai receber e 3° parâmetro as propriedades que será ignorada.)
+		return pessoaRepository.save(pessoaSalva);
+	}
+
+	public void updateAtivo(Long codigo, Boolean ativo) {
+		Pessoa pessoaSalva = findPeopleByCodigo(codigo);
+		pessoaSalva.setAtivo(ativo);
+		pessoaRepository.save(pessoaSalva);
+	}
+
+	private Pessoa findPeopleByCodigo(Long codigo) {
 		Pessoa pessoaSalva = pessoaRepository.findOne(codigo);
 		if (pessoaSalva == null) {
 			throw new EmptyResultDataAccessException(1);
 		}
-		BeanUtils.copyProperties(pessoa, pessoaSalva, "codigo"); // copia as propriedades para o pessoaSalva(1° parâmetro vc passa o Objeto que quer copiar,2° parâmetro o Objeto que vai receber e 3° parâmetro as propriedades que será ignorada.)
-		return pessoaRepository.save(pessoaSalva);
+		return pessoaSalva;
 	}
 }
