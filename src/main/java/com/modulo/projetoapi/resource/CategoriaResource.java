@@ -33,7 +33,7 @@ public class CategoriaResource {
 	@GetMapping(value = "/{codigo}")
 	public ResponseEntity<Categoria> findById(@PathVariable Long codigo){
 		Categoria categoriaBuscar = categoriaRepository.findOne(codigo);
-		return (!(categoriaBuscar == null)) ? ResponseEntity.ok(categoriaBuscar) : ResponseEntity.notFound().build();
+		return !(categoriaBuscar == null) ? ResponseEntity.ok(categoriaBuscar) : ResponseEntity.notFound().build();
 	}
 
 	@PostMapping
