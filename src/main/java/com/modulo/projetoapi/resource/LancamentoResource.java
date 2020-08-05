@@ -12,6 +12,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,37 +35,46 @@ public class LancamentoResource {
 
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
-	
+
 	@Autowired
 	private LancamentoService lancamentoService;
-	
+
 	@Autowired
 	private ApplicationEventPublisher publisher;
-	
+
 	@Autowired
 	private MessageSource messageSource;
 
 	@GetMapping
-	public List<Lancamento> search(LancamentoFilter lancamentoFilter){
+	public List<Lancamento> search(LancamentoFilter lancamentoFilter) {
 		return lancamentoRepository.filter(lancamentoFilter);
 	}
 
 	@GetMapping(value = "/{codigo}")
-	public ResponseEntity<Lancamento> findById(@PathVariable Long codigo){
-		Lancamento findById= lancamentoRepository.findOne(codigo);
+	public ResponseEntity<Lancamento> findById(@PathVariable Long codigo) {
+		Lancamento findById = lancamentoRepository.findOne(codigo);
 		return !(findById == null) ? ResponseEntity.ok().body(findById) : ResponseEntity.notFound().build();
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Lancamento> insert(@Valid @RequestBody Lancamento lancamento,HttpServletResponse response){
+	public ResponseEntity<Lancamento> insert(@Valid @RequestBody Lancamento lancamento, HttpServletResponse response) {
 		Lancamento lancamentoSave = lancamentoService.save(lancamento);
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, lancamentoSave.getCodigo()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoSave);
 	}
-	
-	@ExceptionHandler( {PessoaInexistenteouInativaException.class} )
-	public ResponseEntity<Object> PessoaInexistenteouInativaException(PessoaInexistenteouInativaException ex){
-		String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null, LocaleContextHolder.getLocale());
+
+	@DeleteMapping(value = "/{codigo}")
+	public ResponseEntity<Void> delete(@PathVariable Long codigo) {
+		lancamentoRepository.delete(codigo);
+		return ResponseEntity.noContent().build();
+	}
+
+	// lançar exception ao salvar um lançamento para uma pessoa inativa ou
+	// inexistente.
+	@ExceptionHandler({ PessoaInexistenteouInativaException.class })
+	public ResponseEntity<Object> PessoaInexistenteouInativaException(PessoaInexistenteouInativaException ex) {
+		String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null,
+				LocaleContextHolder.getLocale());
 		String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
 		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		return ResponseEntity.badRequest().body(erros);
