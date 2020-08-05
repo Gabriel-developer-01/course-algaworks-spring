@@ -24,6 +24,7 @@ import com.modulo.projetoapi.event.RecursoCriadoEvent;
 import com.modulo.projetoapi.exceptionsHandler.ExceptionHandler.Erro;
 import com.modulo.projetoapi.model.Lancamento;
 import com.modulo.projetoapi.repository.LancamentoRepository;
+import com.modulo.projetoapi.repository.filter.LancamentoFilter;
 import com.modulo.projetoapi.service.LancamentoService;
 import com.modulo.projetoapi.service.exception.PessoaInexistenteouInativaException;
 
@@ -44,8 +45,8 @@ public class LancamentoResource {
 	private MessageSource messageSource;
 
 	@GetMapping
-	public List<Lancamento> findAll(){
-		return lancamentoRepository.findAll();
+	public List<Lancamento> search(LancamentoFilter lancamentoFilter){
+		return lancamentoRepository.filter(lancamentoFilter);
 	}
 
 	@GetMapping(value = "/{codigo}")
