@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,8 +48,8 @@ public class LancamentoResource {
 	private MessageSource messageSource;
 
 	@GetMapping
-	public List<Lancamento> search(LancamentoFilter lancamentoFilter) {
-		return lancamentoRepository.filter(lancamentoFilter);
+	public Page<Lancamento> search(LancamentoFilter lancamentoFilter, Pageable pageable) {
+		return lancamentoRepository.filter(lancamentoFilter, pageable);
 	}
 
 	@GetMapping(value = "/{codigo}")
@@ -69,8 +71,7 @@ public class LancamentoResource {
 		return ResponseEntity.noContent().build();
 	}
 
-	// lançar exception ao salvar um lançamento para uma pessoa inativa ou
-	// inexistente.
+	// lançar exception ao salvar um lançamento para uma pessoa inativa ou inexistente.
 	@ExceptionHandler({ PessoaInexistenteouInativaException.class })
 	public ResponseEntity<Object> PessoaInexistenteouInativaException(PessoaInexistenteouInativaException ex) {
 		String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null,
