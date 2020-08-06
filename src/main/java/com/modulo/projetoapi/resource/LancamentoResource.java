@@ -32,7 +32,7 @@ import com.modulo.projetoapi.service.LancamentoService;
 import com.modulo.projetoapi.service.exception.PessoaInexistenteouInativaException;
 
 @RestController
-@RequestMapping(value = "/{lancamentos}")
+@RequestMapping(value = "/lancamentos")
 public class LancamentoResource {
 
 	@Autowired
