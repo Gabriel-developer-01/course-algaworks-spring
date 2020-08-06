@@ -27,9 +27,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		.secret("@ngul@r0")
 		//necessário definir senão gera erro
 		.scopes("read", "write")
-		.authorizedGrantTypes("password")
+		.authorizedGrantTypes("password", "refresh_token")
 		//Tempo de acesso do token em segundos
-		.accessTokenValiditySeconds(1800);
+		.accessTokenValiditySeconds(20)
+		.refreshTokenValiditySeconds(3600 * 24); //tempo de vida do refresh token 1 dia.
 	}
 
 	//Configurações para o endpoints do Token
@@ -38,6 +39,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		endpoints
 		.tokenStore(tokenStore())
 		.accessTokenConverter(accessTokenConverter())
+		.reuseRefreshTokens(false) //sempre que solicitado será enviado refresh token para o usuário.Ele não se deslogará.se não setado.
 		.authenticationManager(authenticationManager);
 	}
 
