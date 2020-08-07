@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,17 +32,20 @@ public class CategoriaResource {
 	private ApplicationEventPublisher publisher;
 
 	@GetMapping
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
 	public List<Categoria> findAll(){
 		return categoriaRepository.findAll();
 	}
 
 	@GetMapping(value = "/{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
 	public ResponseEntity<Categoria> findById(@PathVariable Long codigo){
 		Categoria categoriaBuscar = categoriaRepository.findOne(codigo);
 		return !(categoriaBuscar == null) ? ResponseEntity.ok(categoriaBuscar) : ResponseEntity.notFound().build();
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_CATEGORIA') and #oauth2.hasScope('write')")
 	public ResponseEntity<Categoria> insert(@Valid @RequestBody Categoria categoria,HttpServletResponse response) {
 		Categoria categoriaSalva = categoriaRepository.save(categoria);
 
